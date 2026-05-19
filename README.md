@@ -1,84 +1,71 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/ulyILqqB)
 # Weekly Coding #9: Midnight Monster Delivery
 
 ## Summary
 
-Write 3–6 lines explaining what this program does.
-
-Example starting point:
-
-This program finds the cheapest delivery routes through a haunted city. Each location is a node, and each haunted road has a positive travel cost. The main algorithm is Dijkstra's algorithm using a heap-based priority queue.
+This program finds the cheapest delivery routes through a haunted city using Dijkstra’s algorithm. Each location is represented as a node, and each haunted road has a positive travel cost. The program uses a heap-based priority queue to efficiently calculate the shortest delivery costs and paths between locations.
 
 ## Approach
 
-Explain your approach in bullets.
-
-- How did you represent the graph?
-- How did you use the priority queue/frontier?
-- How did relaxation work in your solution?
-- How did you reconstruct the final path?
+- The graph was represented using a dictionary of dictionaries.
+- Each location stores neighboring locations and their travel costs.
+- I used `heapq` as the priority queue/frontier to always process the cheapest location first.
+- Relaxation worked by checking whether a newly discovered path had a lower cost than the current known cost.
+- If a shorter path was found, the distance was updated and added back into the heap.
+- I reconstructed the final path using a `previous` dictionary that stored the previous node for each location.
 
 ## Complexity
 
-Explain the time and space complexity of your Dijkstra functions.
-
-Suggested format:
-
-```text
 Time complexity: O((V + E) log V), where V is the number of locations and E is the number of roads.
 
 Space complexity: O(V) extra space for distances, previous nodes, and the frontier. If we include graph storage, the total is O(V + E).
-```
 
 Now write your own explanation:
 
 - `monster_delivery_costs`:
-  - Time:
-  - Space:
-  - Why:
+  - Time: O((V + E) log V)
+  - Space: O(V)
+  - Why: Each node and edge may be processed through the priority queue, and the heap operations require logarithmic time.
 
 - `shortest_monster_delivery`:
-  - Time:
-  - Space:
-  - Why:
+  - Time: O((V + E) log V)
+  - Space: O(V)
+  - Why: The algorithm stores distances, previous nodes, and uses a heap-based priority queue while reconstructing the shortest path.
 
 ## Edge-Case Checklist
 
-Check the cases your code handles.
-
-- [ ] start equals target
-- [ ] target is unreachable
-- [ ] start node is missing
-- [ ] target node is missing
-- [ ] node has no outgoing edges
-- [ ] graph contains cycles
-- [ ] tied shortest paths
-- [ ] negative edge weight
-- [ ] zero edge weight
-- [ ] neighbor not listed as a graph node
+- [x] start equals target
+- [x] target is unreachable
+- [x] start node is missing
+- [x] target node is missing
+- [x] node has no outgoing edges
+- [x] graph contains cycles
+- [x] tied shortest paths
+- [x] negative edge weight
+- [x] zero edge weight
+- [x] neighbor not listed as a graph node
 
 ## Tests I Added
 
-List any tests you added beyond the starter tests.
-
-- 
-- 
-- 
+- Tested unreachable target locations
+- Tested missing start node handling
+- Tested graphs with invalid negative weights
 
 ## Assistance & Sources
 
-AI used? Y/N:
+AI used? Y
 
 If yes, what did it help with?
 
-- 
+- Helped explain Dijkstra’s algorithm
+- Helped debug and review Python code
+- Helped improve README explanations
 
 Other sources used:
 
-- 
+- Python documentation
+- Course lecture materials
 
 ## Notes for Instructor
 
-Anything you want me to know before grading?
-
-- 
+- The project uses Dijkstra’s algorithm with `heapq`.
+- Path reconstruction was implemented using a previous-node map.

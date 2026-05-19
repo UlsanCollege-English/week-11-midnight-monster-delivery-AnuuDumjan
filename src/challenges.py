@@ -10,6 +10,7 @@ Rules:
 """
 
 from math import inf
+import heapq
 
 
 HAUNTED_CITY = {
@@ -39,45 +40,62 @@ HAUNTED_CITY = {
 
 
 def validate_haunted_map(graph: dict[str, dict[str, int]]) -> None:
-    """Raise ValueError if the haunted map is invalid.
+    """Raise ValueError if the haunted map is invalid."""
+    
+    if not isinstance(graph, dict):
+        raise ValueError("Graph must be a dictionary")
 
-    A valid haunted map:
-    - is a dictionary
-    - each node maps to a dictionary of neighbors
-    - every neighbor is also a node in the graph
-    - every edge weight is positive
+    for node, neighbors in graph.items():
 
-    Args:
-        graph: Weighted graph represented as an adjacency dictionary.
+        if not isinstance(neighbors, dict):
+            raise ValueError("Neighbors must be a dictionary")
 
-    Raises:
-        ValueError: If the graph is invalid.
-    """
-    # TODO: Implement this function.
-    raise NotImplementedError
+        for neighbor, weight in neighbors.items():
+
+            if neighbor not in graph:
+                raise ValueError("Neighbor missing from graph")
+
+            if weight <= 0:
+                raise ValueError("Edge weights must be positive")
 
 
 def monster_delivery_costs(
     graph: dict[str, dict[str, int]],
     start: str,
 ) -> dict[str, float]:
-    """Return the cheapest delivery cost from start to every location.
+    """Return the cheapest delivery cost from start to every location."""
 
-    Use Dijkstra's algorithm with heapq.
+    validate_haunted_map(graph)
 
-    Args:
-        graph: Weighted graph represented as an adjacency dictionary.
-        start: Starting location.
+    if start not in graph:
+        raise ValueError("Start location missing")
 
-    Returns:
-        Dictionary mapping each location to its cheapest known cost.
-        Unreachable locations should stay as math.inf.
+    costs = {node: inf for node in graph}
+    costs[start] = 0
 
-    Raises:
-        ValueError: If the graph is invalid or start is missing.
-    """
-    # TODO: Implement this function.
-    raise NotImplementedError
+    priority_queue = [(0, start)]
+
+    while priority_queue:
+
+        current_cost, current_node = heapq.heappop(priority_queue)
+
+        if current_cost > costs[current_node]:
+            continue
+
+        for neighbor, weight in graph[current_node].items():
+
+            new_cost = current_cost + weight
+
+            if new_cost < costs[neighbor]:
+
+                costs[neighbor] = new_cost
+
+                heapq.heappush(
+                    priority_queue,
+                    (new_cost, neighbor)
+                )
+
+    return costs
 
 
 def shortest_monster_delivery(
@@ -85,24 +103,58 @@ def shortest_monster_delivery(
     start: str,
     target: str,
 ) -> tuple[float, list[str]]:
-    """Return the cheapest cost and path from start to target.
+    """Return the cheapest cost and path from start to target."""
 
-    Use Dijkstra's algorithm with heapq and reconstruct the path using
-    a previous-node map.
+    if start not in graph or target not in graph:
+        return (inf, [])
 
-    Args:
-        graph: Weighted graph represented as an adjacency dictionary.
-        start: Starting location.
-        target: Destination location.
+    if start == target:
+        return (0, [start])
 
-    Returns:
-        (cost, path), where path is in start-to-target order.
-        If start or target is missing, return (math.inf, []).
-        If target is unreachable, return (math.inf, []).
-        If start equals target, return (0, [start]).
-    """
-    # TODO: Implement this function.
-    raise NotImplementedError
+    validate_haunted_map(graph)
+
+    costs = {node: inf for node in graph}
+    previous = {}
+
+    costs[start] = 0
+
+    priority_queue = [(0, start)]
+
+    while priority_queue:
+
+        current_cost, current_node = heapq.heappop(priority_queue)
+
+        if current_cost > costs[current_node]:
+            continue
+
+        for neighbor, weight in graph[current_node].items():
+
+            new_cost = current_cost + weight
+
+            if new_cost < costs[neighbor]:
+
+                costs[neighbor] = new_cost
+                previous[neighbor] = current_node
+
+                heapq.heappush(
+                    priority_queue,
+                    (new_cost, neighbor)
+                )
+
+    if costs[target] == inf:
+        return (inf, [])
+
+    path = []
+    current = target
+
+    while current != start:
+        path.append(current)
+        current = previous[current]
+
+    path.append(start)
+    path.reverse()
+
+    return (costs[target], path)
 
 
 def best_next_monster_stop(
@@ -110,22 +162,18 @@ def best_next_monster_stop(
     start: str,
     targets: list[str],
 ) -> tuple[str, float]:
-    """Return the reachable target with the cheapest delivery cost.
+    """Return the reachable target with the cheapest delivery cost."""
 
-    Stretch challenge.
+    costs = monster_delivery_costs(graph, start)
 
-    Rules:
-    - Ignore unreachable targets.
-    - If no target is reachable, return ("", math.inf).
-    - If there is a tie, return the target that appears first in targets.
+    best_target = ""
+    best_cost = inf
 
-    Args:
-        graph: Weighted graph represented as an adjacency dictionary.
-        start: Starting location.
-        targets: Possible destination locations.
+    for target in targets:
 
-    Returns:
-        A tuple of (target, cost).
-    """
-    # TODO: Optional stretch. Implement if you want an extra challenge.
-    raise NotImplementedError
+        if target in costs and costs[target] < best_cost:
+
+            best_target = target
+            best_cost = costs[target]
+
+    return (best_target, best_cost)
